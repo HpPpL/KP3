@@ -8,7 +8,7 @@ import PySimpleGUI as sg
 DEFAULT_WIDTH, DEFAULT_HEIGHT = 600, 600
 DEFAULT_MAX_ITER = 200
 DEFAULT_MIN_X, DEFAULT_MIN_Y, DEFAULT_MAX_X, DEFAULT_MAX_Y = -1, -1, 1, 1
-DEFAULT_R = 2
+DEFAULT_R = 4
 DEFAULT_COLORMAP = 'twilight_shifted_r'
 
 
@@ -85,8 +85,7 @@ def get_user_settings():
 
 # ---- Вычислительная часть ----
 
-# Расчетная функция
-@njit
+@njit(fastmath=True)
 def func(z: complex, c: complex) -> complex:
     """
     Вычисляет значение функции в точке.
@@ -98,11 +97,14 @@ def func(z: complex, c: complex) -> complex:
     Returns:
         complex: Комплексное значение.
     """
-    return z ** 2 + c
+    return z ** 3 + c
 
 
-@njit
-def check_point(c: complex, r: float, max_iter: int, z: complex) -> int:
+@njit(fastmath=True)
+def check_point(c: complex,
+                r: float,
+                max_iter: int,
+                z: complex) -> int:
     """
     Проверяет точку на хаотичность.
 
@@ -125,7 +127,11 @@ def check_point(c: complex, r: float, max_iter: int, z: complex) -> int:
 
 
 @njit(parallel=True)
-def set_calculate(c: complex, min_x: float, max_x: float, min_y: float, max_y: float, r: float, width: int, height: int,
+def set_calculate(c: complex,
+                  min_x: float, max_x: float,
+                  min_y: float, max_y: float,
+                  r: float,
+                  width: int, height: int,
                   max_iter: int) -> np.ndarray:
     """
     Проверяет каждую точку области на хаотичность.
@@ -187,7 +193,7 @@ prev_mouse_pos = None
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 fps_text = font.render('FPS: ', True, (255, 255, 255))
-complex_point_text = font.render('Complex Point: ', True, (255, 255, 255))
+complex_point_text = font.render('CP: ', True, (255, 255, 255))
 
 while running:
     for event in pygame.event.get():
